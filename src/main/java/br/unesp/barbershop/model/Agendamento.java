@@ -8,11 +8,16 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.UniqueConstraint;
 
 @Entity
 public class Agendamento {
@@ -27,17 +32,44 @@ public class Agendamento {
     @ManyToOne
     private Usuario usuario;
 
-    @OneToMany(mappedBy = "agendamento", orphanRemoval = true, cascade = CascadeType.ALL)
+
+    @JsonIgnore
+    @org.hibernate.annotations.ForeignKey(name="barbearia_id")
+    @ManyToOne
+    private Barbearia barbearia;
+
+    @JsonIgnore
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(name = "servicos_agendamentos",
+                uniqueConstraints = @UniqueConstraint (
+                    columnNames = {"servico_id", "agendamento_id"},
+                    name = "unique_user_servico"
+                ),
+                joinColumns = @JoinColumn(name = "agendamento_id",
+                    referencedColumnName = "id",
+                    table = "agendamento",
+                    unique = false
+                ),
+                inverseJoinColumns = @JoinColumn (
+                    name = "servico_id",
+                    referencedColumnName = "id",
+                    table = "servico",
+                    unique = false
+                    //updatable = false,
+                )
+    )
     private List<Servico> servicos = new ArrayList<Servico>();
+
 
     public Agendamento() {
     }
 
-    public Agendamento(Long id, Date data, Usuario usuario, List<Servico> servicos) {
+    public Agendamento(Long id, Date data, Usuario usuario, Barbearia barbearia, List<Servico> servicos) {
         this.id = id;
         this.data = data;
         this.usuario = usuario;
         this.servicos = servicos;
+        this.barbearia = barbearia;
     }
 
     public Long getId() {
@@ -71,6 +103,12 @@ public class Agendamento {
     public void setServicos(List<Servico> servicos) {
         this.servicos = servicos;
     }
+    public Barbearia getBarbearia() {
+        return barbearia;
+    }
 
+    public void setBarbearia(Barbearia barbearia) {
+        this.barbearia = barbearia;
+    }
     
 }

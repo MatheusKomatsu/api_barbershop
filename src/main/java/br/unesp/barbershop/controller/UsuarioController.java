@@ -35,20 +35,25 @@ public class UsuarioController {
     @PostMapping(value = "/", produces = "application/json")
     public ResponseEntity<Usuario> cadastrar(@RequestBody Usuario usuario){
         Usuario novo_usuario = usuarioRepository.save(usuario);
-
+        
         return new ResponseEntity<>(novo_usuario, HttpStatus.OK);
     }
 
     @PutMapping(value = "/", produces = "application/json")
     public ResponseEntity<Usuario> atualizar(@RequestBody Usuario usuario){
-        Usuario usuario_atualizado = usuarioRepository.save(usuario);
+        Usuario usuario_atualizado = usuarioRepository.findById(usuario.getId()).get();
 
+        if(usuario_atualizado == null){
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+        usuario_atualizado = usuarioRepository.save(usuario);
+        
         return new ResponseEntity<>(usuario_atualizado, HttpStatus.OK);
     }
 
     @DeleteMapping(value = "/{id}", produces = "application/json")
     public String deletar(@PathVariable("id") Long id){
-        usuarioRepository.deleteById(id);
+        usuarioRepository.deleteById(id);   
 
         return "Usuario deletado";
     }

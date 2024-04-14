@@ -7,16 +7,13 @@ import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.JoinTable;
-import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.UniqueConstraint;
-import jakarta.persistence.JoinColumn;
+import jakarta.persistence.OneToMany;
 
 @Entity
 public class Barbearia{
@@ -33,53 +30,24 @@ public class Barbearia{
     private Usuario usuario;
 
     @JsonIgnore
-    @ManyToMany(fetch = FetchType.EAGER)
-    @JoinTable(name = "servicos_barbearias",
-                uniqueConstraints = @UniqueConstraint (
-                    columnNames = {"servico_id", "barbearia_id"},
-                    name = "unique_user_servico"
-                ),
-                joinColumns = @JoinColumn(name = "barbearia_id",
-                    referencedColumnName = "id",
-                    table = "barbearia",
-                    unique = false
-                ),
-                inverseJoinColumns = @JoinColumn (
-                    name = "servico_id",
-                    referencedColumnName = "id",
-                    table = "servico",
-                    unique = false
-                    //updatable = false,
-                )
-    )
+    @OneToMany(mappedBy = "barbearia", orphanRemoval = true, cascade = CascadeType.ALL)
     private List<Servico> servicos = new ArrayList<Servico>();
 
-    public Usuario getUsuario() {
-        return usuario;
-    }
+    @JsonIgnore
+    @OneToMany(mappedBy="barbearia", orphanRemoval = true, cascade = CascadeType.ALL)
+    private List<Agendamento> agendamentos = new ArrayList<Agendamento>();
 
-    public void setUsuario(Usuario usuario) {
-        this.usuario = usuario;
-    }
-
-    // Getter e Setter para usuarios
-    public List<Servico> getUsuarios() {
-        return servicos;
-    }
-
-    public void setUsuarios(List<Servico> usuarios) {
-        this.servicos = usuarios;
-    }
 
     public Barbearia() {
     }
 
-    public Barbearia(Long id, String nomeBarbearia, String endereco, Usuario usuario, List<Servico> servicos) {
+    public Barbearia(Long id, String nomeBarbearia, String endereco, Usuario usuario, List<Servico> servicos, List<Agendamento> agendamentos) {
         this.id = id;
         this.nomeBarbearia = nomeBarbearia;
         this.endereco = endereco;
         this.usuario = usuario;
         this.servicos = servicos;
+        this.agendamentos = agendamentos;
     }
 
     public Long getId() {
@@ -105,5 +73,28 @@ public class Barbearia{
     public void setEndereco(String endereco) {
         this.endereco = endereco;
     }
+
+    public Usuario getUsuario() {
+        return usuario;
+    }
+
+    public void setUsuario(Usuario usuario) {
+        this.usuario = usuario;
+    }
+
+    public List<Servico> getServicos() {
+        return servicos;
+    }
+
+    public void setServicos(List<Servico> servicos) {
+        this.servicos = servicos;
+    }
+   public List<Agendamento> getAgendamentos() {
+        return agendamentos;
+    }
+
+    public void setAgendamentos(List<Agendamento> agendamentos) {
+        this.agendamentos = agendamentos;
+    }    
 
 }
