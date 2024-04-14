@@ -63,12 +63,4 @@ public class UsuarioController {
 
         return "Usuario deletada";
     }
-
-    // pegando todos os agendamentos de determinado usuario
-    // @GetMapping(value = "/agendamentos", produces = "application/json")
-    // public ResponseEntity<List<Agendamento>> agendamento(){
-    //     List<Agendamento> agendamento_usuario = (List<Agendamento>)agendamentoRepository.findAll();
-
-    //     return new ResponseEntity<List<Agendamento>>(agendamento_usuario, HttpStatus.OK);
-    // }
 }
