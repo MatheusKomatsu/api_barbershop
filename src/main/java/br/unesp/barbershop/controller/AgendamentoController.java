@@ -2,7 +2,6 @@ package br.unesp.barbershop.controller;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -44,32 +43,24 @@ public class AgendamentoController {
     // Buscando todos os agendamentos
     @GetMapping(value = "/barbearia/{id}", produces = "application/json")
     public ResponseEntity<List<Agendamento>> visualizarAgendamentosBarbearia(@PathVariable(name= "id") Long id){
-        Barbearia barbearia = barbeariaRepository.findById(id).get();
+        Barbearia barbearia = barbeariaRepository.findById(id).orElseGet(null);
         if (barbearia == null){
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
 
         return new ResponseEntity<List<Agendamento>>(barbearia.getAgendamentos(), HttpStatus.OK);
-    }
-
-    // // Buscando todos os agendamentos
-    // @GetMapping(value = "/usuario/", produces = "application/json")
-    // public ResponseEntity<List<Agendamento>> Agendamento(){
-    //     List<Agendamento> agendamentos_list = (List<Agendamento>) agendamentoRepository.findAll();
-
-    //     return new ResponseEntity<List<Agendamento>>(agendamentos_list, HttpStatus.OK);
-    // }    
+    }  
 
     // Criando agendamentos
     @PostMapping(value = "/", produces = "application/json")
     public ResponseEntity<Agendamento> cadastrar(@RequestBody AgendamentoDTO agendamentoDto){
 
-        Barbearia barbearia_escolhida = barbeariaRepository.findById(agendamentoDto.getBarbearia_id()).get();
+        Barbearia barbearia_escolhida = barbeariaRepository.findById(agendamentoDto.getBarbearia_id()).orElseGet(null);
         if(barbearia_escolhida == null){
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
 
-        Usuario usuario_atendido = usuarioRepository.findById(agendamentoDto.getUsuario_id()).get();
+        Usuario usuario_atendido = usuarioRepository.findById(agendamentoDto.getUsuario_id()).orElseGet(null);
         if(usuario_atendido == null){
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
@@ -109,7 +100,7 @@ public class AgendamentoController {
     // Editando agendamentos
     @PutMapping(value = "/", produces = "application/json")
     public ResponseEntity<Agendamento> atualizar(@RequestBody Agendamento agendamento){
-        Agendamento agendamento_atualizado = agendamentoRepository.findById(agendamento.getId()).get();
+        Agendamento agendamento_atualizado = agendamentoRepository.findById(agendamento.getId()).orElseGet(null);
 
         if(agendamento_atualizado == null){
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
@@ -121,6 +112,12 @@ public class AgendamentoController {
     // Deletando agendamentos
     @DeleteMapping(value = "/{id}", produces = "application/json")
     public String deletar(@PathVariable("id") Long id){
+        Agendamento verifica_agendamento = agendamentoRepository.findById(id).orElseGet(null);
+
+        if(verifica_agendamento == null){
+            return "Agendamento não encontrado";
+        }
+
         agendamentoRepository.deleteById(id);
 
         return "Agendamento deletado";

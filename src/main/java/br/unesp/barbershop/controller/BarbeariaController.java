@@ -1,7 +1,6 @@
 package br.unesp.barbershop.controller;
 
 import java.util.List;
-import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -40,7 +39,7 @@ public class BarbeariaController {
 
     @PostMapping(value = "/", produces = "application/json")
     public ResponseEntity<Barbearia> cadastrar(@RequestBody BarbeariaDTO barbeariadto){
-        Usuario usuario_dono = usuarioRepository.findById(barbeariadto.getUsuario_id()).get();
+        Usuario usuario_dono = usuarioRepository.findById(barbeariadto.getUsuario_id()).orElseGet(null);;
 
         if(usuario_dono == null){
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
@@ -71,6 +70,12 @@ public class BarbeariaController {
 
     @DeleteMapping(value = "/{id}", produces = "application/json")
     public String deletar(@PathVariable("id") Long id){
+        Barbearia verifica_barbearia = barbeariaRepository.findById(id).orElseGet(null);;
+
+        if(verifica_barbearia == null){
+            return "Barbearia não encontrada";
+        }
+
         barbeariaRepository.deleteById(id);
 
         return "Barbearia deletada";

@@ -41,7 +41,7 @@ public class UsuarioController {
 
     @PutMapping(value = "/", produces = "application/json")
     public ResponseEntity<Usuario> atualizar(@RequestBody Usuario usuario){
-        Usuario usuario_atualizado = usuarioRepository.findById(usuario.getId()).get();
+        Usuario usuario_atualizado = usuarioRepository.findById(usuario.getId()).orElseGet(null);
 
         if(usuario_atualizado == null){
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
@@ -53,9 +53,15 @@ public class UsuarioController {
 
     @DeleteMapping(value = "/{id}", produces = "application/json")
     public String deletar(@PathVariable("id") Long id){
-        usuarioRepository.deleteById(id);   
+        Usuario verifica_usuario = usuarioRepository.findById(id).orElseGet(null);;
 
-        return "Usuario deletado";
+        if(verifica_usuario == null){
+            return "Usuário não encontrado";
+        }
+
+        usuarioRepository.deleteById(id);
+
+        return "Usuario deletada";
     }
 
     // pegando todos os agendamentos de determinado usuario

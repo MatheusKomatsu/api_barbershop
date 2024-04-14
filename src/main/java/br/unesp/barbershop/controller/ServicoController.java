@@ -31,7 +31,7 @@ public class ServicoController {
     // BUSCANDO TODOS OS servicos
     @GetMapping(value = "/barbearia/{id}", produces = "application/json")
     public ResponseEntity<List<Servico>> Servico(@PathVariable("id") Long id){
-        Barbearia barbearia = barbeariaRepository.findById(id).get();
+        Barbearia barbearia = barbeariaRepository.findById(id).orElseGet(null);
 
         if(barbearia == null){
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
@@ -44,7 +44,7 @@ public class ServicoController {
 
     @PostMapping(value = "/", produces = "application/json")
     public ResponseEntity<Servico> cadastrar(@RequestBody ServicoDTO servicodto){
-        Barbearia barbearia_servico = barbeariaRepository.findById(servicodto.getBarbearia_id()).get();
+        Barbearia barbearia_servico = barbeariaRepository.findById(servicodto.getBarbearia_id()).orElseGet(null);;
 
         if(barbearia_servico == null){
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
@@ -63,7 +63,7 @@ public class ServicoController {
 
     @PutMapping(value = "/", produces = "application/json")
     public ResponseEntity<Servico> atualizar(@RequestBody Servico servico){
-        Servico servico_atualizado = servicoRepository.findById(servico.getId()).get();
+        Servico servico_atualizado = servicoRepository.findById(servico.getId()).orElseGet(null);;
 
         if(servico_atualizado == null){
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
@@ -76,6 +76,12 @@ public class ServicoController {
 
     @DeleteMapping(value = "/{id}", produces = "application/json")
     public String deletar(@PathVariable("id") Long id){
+        Servico verifica_servico = servicoRepository.findById(id).orElseGet(null);;
+
+        if(verifica_servico == null){
+            return "Serviço não encontrado";
+        }
+
         servicoRepository.deleteById(id);
 
         return "Serviço deletado";
