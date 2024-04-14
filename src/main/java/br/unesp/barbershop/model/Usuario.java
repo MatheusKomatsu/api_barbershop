@@ -10,7 +10,6 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 
-//TODO: adicionar lista de agendamentos(se possuir)(um para muitos) e lista de barbearias(se possuir)(um para muitos)
 @Entity
 public class Usuario {
 

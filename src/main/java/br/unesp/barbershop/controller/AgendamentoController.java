@@ -2,6 +2,7 @@ package br.unesp.barbershop.controller;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -59,29 +60,6 @@ public class AgendamentoController {
     //     return new ResponseEntity<List<Agendamento>>(agendamentos_list, HttpStatus.OK);
     // }    
 
-    public List<Servico> verificaServico(List<Servico> servicos_barbearia, List<Long> servicos_id){
-
-        List<Servico> servicos_agendamento = new ArrayList<>();
-
-        for (Long servico_id : servicos_id){
-            Servico servico_aux = servicoRepository.findById(servico_id).get();
-            
-            System.out.println(servico_aux);
-
-            if(servico_aux == null){
-                return null;
-            }
-
-            if(!servicos_barbearia.contains(servico_aux)){
-                return null;
-            }
-            
-            servicos_agendamento.add(servico_aux);
-            
-        }
-        return servicos_agendamento;
-    }
-
     // Criando agendamentos
     @PostMapping(value = "/", produces = "application/json")
     public ResponseEntity<Agendamento> cadastrar(@RequestBody AgendamentoDTO agendamentoDto){
@@ -97,30 +75,23 @@ public class AgendamentoController {
         }
         
         List<Servico> servicos = barbearia_escolhida.getServicos();
-        // List<Servico> servicos_agendamento = new ArrayList<>();
+        List<Servico> servicos_agendamento = new ArrayList<>();
         List<Long> servicos_id = agendamentoDto.getServicos_id(); 
-
-        List<Servico> servicos_agendamento = verificaServico(servicos, servicos_id);
-
-        if(servicos_agendamento == null){
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
         
-        // for (Long servico_id : servicos_id){
-        //     // TODO: consertar parte de verificação de serviços (caso serviço colocado não exista)
+        for (Long servico_id : servicos_id){
 
-        //     Servico servico_aux = servicoRepository.findById(servico_id).get();
+            Servico servico_aux = servicoRepository.findById(servico_id).isPresent() ? servicoRepository.findById(servico_id).get() : null;
             
-        //     if(servico_aux == null){
-        //         return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        //     }
+            if(servico_aux == null){
+                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            }
 
-        //     if(!servicos.contains(servico_aux)){
-        //         return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        //     }
+            if(!servicos.contains(servico_aux)){
+                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            }
             
-        //     servicos_agendamento.add(servico_aux);
-        // }
+            servicos_agendamento.add(servico_aux);
+        }
 
 
         Agendamento agendamento = new Agendamento();
