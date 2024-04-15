@@ -50,6 +50,17 @@ public class BarbeariaController {
 
         return new ResponseEntity<Barbearia>(barbearia, HttpStatus.OK);
     }
+    // Buscando todos os agendamentos de uma barbearia
+    @GetMapping(value = "/{id}/agendamentos", produces = "application/json")
+    public ResponseEntity<List<Agendamento>> listarAgendamentosBarbearia(@PathVariable(name= "id") Long id){
+        Barbearia barbearia = barbeariaRepository.findById(id).isPresent()
+        ? barbeariaRepository.findById(id).get():null;
+        if (barbearia == null){
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+
+        return new ResponseEntity<List<Agendamento>>(barbearia.getAgendamentos(), HttpStatus.OK);
+    }
     // Criando Barbearia
     @PostMapping(value = "/", produces = "application/json")
     public ResponseEntity<Barbearia> cadastrar(@RequestBody BarbeariaDTO barbeariadto){
@@ -116,14 +127,5 @@ public class BarbeariaController {
         return new ResponseEntity<List<Servico>>(barbearia.getServicos(), HttpStatus.OK);
     }
 
-    // Buscando todos os agendamentos de uma barbearia
-    @GetMapping(value = "/{id}/agendamentos", produces = "application/json")
-    public ResponseEntity<List<Agendamento>> listarAgendamentosBarbearia(@PathVariable(name= "id") Long id){
-        Barbearia barbearia = barbeariaRepository.findById(id).isPresent()? barbeariaRepository.findById(id).get():null;
-        if (barbearia == null){
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
 
-        return new ResponseEntity<List<Agendamento>>(barbearia.getAgendamentos(), HttpStatus.OK);
-    }
 }

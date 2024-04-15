@@ -44,7 +44,8 @@ public class UsuarioController {
     // Lista todas as barbearias de um usuário
     @GetMapping(value = "/{id}/barbearias", produces = "application/json")
     public ResponseEntity<List<Barbearia>> listarBarbeariaUsuario(@PathVariable("id") Long id){
-        Usuario usuario =  usuarioRepository.findById(id).isPresent()? usuarioRepository.findById(id).get():null;
+        Usuario usuario =  usuarioRepository.findById(id).isPresent()
+        ? usuarioRepository.findById(id).get():null;
 
         if(usuario == null){
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
@@ -52,7 +53,17 @@ public class UsuarioController {
         return new ResponseEntity<List<Barbearia>>(usuario.getBarbearias(), HttpStatus.OK);
     }
 
+    // Lista todas os agendamentos de um usuário
+    @GetMapping(value = "/{id}/agendamentos", produces = "application/json")
+    public ResponseEntity<List<Agendamento>> listarAgendamentoUsuario(@PathVariable("id") Long id){
+        Usuario usuario =  usuarioRepository.findById(id).isPresent()
+        ? usuarioRepository.findById(id).get():null;
 
+        if(usuario == null){
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+        return new ResponseEntity<List<Agendamento>>(usuario.getAgendamentos(), HttpStatus.OK);
+    }
 
     @PostMapping(value = "/", produces = "application/json")
     public ResponseEntity<Usuario> cadastrar(@RequestBody Usuario usuario){
@@ -89,14 +100,5 @@ public class UsuarioController {
         return "Usuario deletado";
     }
 
-    // Lista todas os agendamentos de um usuário
-    @GetMapping(value = "/{id}/agendamentos", produces = "application/json")
-    public ResponseEntity<List<Agendamento>> listarAgendamentoUsuario(@PathVariable("id") Long id){
-        Usuario usuario =  usuarioRepository.findById(id).isPresent()? usuarioRepository.findById(id).get():null;
 
-        if(usuario == null){
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
-        return new ResponseEntity<List<Agendamento>>(usuario.getAgendamentos(), HttpStatus.OK);
-    }
 }
