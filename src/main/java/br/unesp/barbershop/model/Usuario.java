@@ -21,6 +21,16 @@ public class Usuario {
     private String email;
     private String senha;
 
+    public Usuario(String nome, String email, String senha,
+        List<Barbearia> barbearias, List<Agendamento> agendamentos) {
+        this.nome = nome;
+        this.email = email;
+        this.senha = senha;
+        this.barbearias = barbearias;
+        this.agendamentos = agendamentos;
+    }
+
+
     @OneToMany(mappedBy = "usuario", orphanRemoval = true, cascade = CascadeType.ALL)
     private List<Barbearia> barbearias = new ArrayList<Barbearia>();
 

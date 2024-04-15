@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import br.unesp.barbershop.model.Agendamento;
 import br.unesp.barbershop.model.Barbearia;
 import br.unesp.barbershop.model.Usuario;
 import br.unesp.barbershop.repository.UsuarioRepository;
@@ -39,8 +40,20 @@ public class UsuarioController {
 
         return new ResponseEntity<Usuario>(usuario, HttpStatus.OK);
     }
+    // Busca todos os agendamentos de um usuário
+    @GetMapping(value = "/{id}/agendamentos", produces = "application/json")
+    public ResponseEntity<List<Agendamento>> listarAgendamentosUsuario(@PathVariable("id") Long id){
+        Usuario usuario =  usuarioRepository.findById(id).isPresent()? usuarioRepository.findById(id).get():null;
+
+        if (usuario == null){
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+
+        return new ResponseEntity<List<Agendamento>>(usuario.getAgendamentos(), HttpStatus.OK);
+    }
+
     // Lista todas as barbearias de um usuário
-    @GetMapping(value = "/{id}/barbearia", produces = "application/json")
+    @GetMapping(value = "/{id}/barbearias", produces = "application/json")
     public ResponseEntity<List<Barbearia>> listarBarbeariaUsuario(@PathVariable("id") Long id){
         Usuario usuario =  usuarioRepository.findById(id).isPresent()? usuarioRepository.findById(id).get():null;
 
@@ -63,7 +76,8 @@ public class UsuarioController {
 
     @PutMapping(value = "/", produces = "application/json")
     public ResponseEntity<Usuario> atualizar(@RequestBody Usuario usuario){
-        Usuario usuario_atualizado = usuarioRepository.findById(usuario.getId()).orElseGet(null);
+        Usuario usuario_atualizado = usuarioRepository.findById(usuario.getId()).isPresent()
+        ?usuarioRepository.findById(usuario.getId()).get():null;
 
         if(usuario_atualizado == null){
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
@@ -85,4 +99,6 @@ public class UsuarioController {
 
         return "Usuario deletado";
     }
+
+    // criar /usuario/{id}/agendamentos
 }
