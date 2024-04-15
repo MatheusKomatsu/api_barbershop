@@ -40,17 +40,6 @@ public class UsuarioController {
 
         return new ResponseEntity<Usuario>(usuario, HttpStatus.OK);
     }
-    // Busca todos os agendamentos de um usuário
-    @GetMapping(value = "/{id}/agendamentos", produces = "application/json")
-    public ResponseEntity<List<Agendamento>> listarAgendamentosUsuario(@PathVariable("id") Long id){
-        Usuario usuario =  usuarioRepository.findById(id).isPresent()? usuarioRepository.findById(id).get():null;
-
-        if (usuario == null){
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
-
-        return new ResponseEntity<List<Agendamento>>(usuario.getAgendamentos(), HttpStatus.OK);
-    }
 
     // Lista todas as barbearias de um usuário
     @GetMapping(value = "/{id}/barbearias", produces = "application/json")

@@ -36,9 +36,12 @@ public class BarbeariaController {
 
         return new ResponseEntity<List<Barbearia>>(barbearias_list, HttpStatus.OK);
     }
+
+    // Busca barbearia específica
     @GetMapping(value = "/{id}", produces = "application/json")
     public ResponseEntity<Barbearia> visualizarBarbearia(@PathVariable("id") Long id){
-        Barbearia barbearia = barbeariaRepository.findById(id).get();
+        Barbearia barbearia = barbeariaRepository.findById(id).isPresent()
+        ?barbeariaRepository.findById(id).get():null;
         if (barbearia == null){
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
@@ -66,15 +69,23 @@ public class BarbeariaController {
     }
 
     @PutMapping(value = "/", produces = "application/json")
-    public ResponseEntity<Barbearia> atualizar(@RequestBody Barbearia barbearia){
-        Barbearia barbearia_atualizada = barbeariaRepository.findById(barbearia.getId()).get();
+    public ResponseEntity<Barbearia> atualizar(@RequestBody BarbeariaDTO barbeariadto){
+        Usuario usuario_dono = usuarioRepository.findById(barbeariadto.getUsuario_id()).isPresent()? 
+        usuarioRepository.findById(barbeariadto.getUsuario_id()).get():null;
 
-        if(barbearia_atualizada == null){
+        if(usuario_dono == null){
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
-        barbearia_atualizada = barbeariaRepository.save(barbearia);
 
-        return new ResponseEntity<>(barbearia_atualizada, HttpStatus.OK);
+        Barbearia barbearia = new Barbearia();
+        barbearia.setId(barbeariadto.getId());
+        barbearia.setNomeBarbearia(barbeariadto.getNomeBarbearia());
+        barbearia.setEndereco(barbeariadto.getEndereco());
+        barbearia.setUsuario(usuario_dono);
+        
+        Barbearia barbeariaAtualizada = barbeariaRepository.save(barbearia);
+
+        return new ResponseEntity<>(barbeariaAtualizada, HttpStatus.OK);
     }
 
     @DeleteMapping(value = "/{id}", produces = "application/json")

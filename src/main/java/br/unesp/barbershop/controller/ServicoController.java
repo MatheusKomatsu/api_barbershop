@@ -28,7 +28,7 @@ public class ServicoController {
 
     @Autowired
     private BarbeariaRepository barbeariaRepository;
-    // BUSCANDO TODOS OS servicos
+    // BUSCANDO todos os servicos de uma barbearia
     @GetMapping(value = "/barbearia/{id}", produces = "application/json")
     public ResponseEntity<List<Servico>> listarServicos(@PathVariable("id") Long id){
         Barbearia barbearia = barbeariaRepository.findById(id).orElseGet(null);
@@ -40,6 +40,7 @@ public class ServicoController {
         
         return new ResponseEntity<List<Servico>>(barbearia.getServicos(), HttpStatus.OK);
     }
+    // Busca um serviço específico
     @GetMapping(value = "/{id}", produces = "application/json")
     public ResponseEntity<Servico> visualizarServico(@PathVariable("id") Long id){
         Servico servico = servicoRepository.findById(id).isPresent()? servicoRepository.findById(id).get(): null;
@@ -54,7 +55,8 @@ public class ServicoController {
 
     @PostMapping(value = "/", produces = "application/json")
     public ResponseEntity<Servico> cadastrar(@RequestBody ServicoDTO servicodto){
-        Barbearia barbearia_servico = barbeariaRepository.findById(servicodto.getBarbearia_id()).orElseGet(null);;
+        Barbearia barbearia_servico = barbeariaRepository.findById(servicodto.getBarbearia_id()).isPresent()
+        ? barbeariaRepository.findById(servicodto.getBarbearia_id()).get():null;
 
         if(barbearia_servico == null){
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
@@ -62,7 +64,8 @@ public class ServicoController {
 
 
         Servico novo_servico = new Servico(servicodto.getId(), servicodto.getNome(), servicodto.getPreco(), 
-                                            servicodto.getTempoServicoMinutos(), servicodto.getDescricao(), barbearia_servico, null);
+                                            servicodto.getTempoServicoMinutos()
+                                            , servicodto.getDescricao(), barbearia_servico, null);
         
         
         
@@ -72,21 +75,30 @@ public class ServicoController {
     }
 
     @PutMapping(value = "/", produces = "application/json")
-    public ResponseEntity<Servico> atualizar(@RequestBody Servico servico){
-        Servico servico_atualizado = servicoRepository.findById(servico.getId()).orElseGet(null);;
+    public ResponseEntity<Servico> atualizar(@RequestBody ServicoDTO servicoDTO){
+        Barbearia barbearia_servico = barbeariaRepository.findById(servicoDTO.getBarbearia_id()).isPresent()
+        ? barbeariaRepository.findById(servicoDTO.getBarbearia_id()).get():null;
 
-        if(servico_atualizado == null){
+        if(barbearia_servico == null){
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
 
-        servico_atualizado = servicoRepository.save(servico);
+
+        Servico servico_atualizado = new Servico(servicoDTO.getId(), servicoDTO.getNome(), servicoDTO.getPreco()
+                                            ,servicoDTO.getTempoServicoMinutos()
+                                            , servicoDTO.getDescricao(), barbearia_servico, null);
+        
+        
+        
+        servicoRepository.save(servico_atualizado);
 
         return new ResponseEntity<>(servico_atualizado, HttpStatus.OK);
     }
 
     @DeleteMapping(value = "/{id}", produces = "application/json")
     public String deletar(@PathVariable("id") Long id){
-        Servico verifica_servico = servicoRepository.findById(id).isPresent()? servicoRepository.findById(id).get(): null;
+        Servico verifica_servico = servicoRepository.findById(id).isPresent()? 
+        servicoRepository.findById(id).get(): null;
 
         if(verifica_servico == null){
             return "Serviço não encontrado";
