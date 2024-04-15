@@ -40,16 +40,7 @@ public class AgendamentoController {
     @Autowired
     private BarbeariaRepository barbeariaRepository;
 
-    // Buscando todos os agendamentos de uma barbearia
-    @GetMapping(value = "/barbearia/{id}", produces = "application/json")
-    public ResponseEntity<List<Agendamento>> listarAgendamentosBarbearia(@PathVariable(name= "id") Long id){
-        Barbearia barbearia = barbeariaRepository.findById(id).isPresent()? barbeariaRepository.findById(id).get():null;
-        if (barbearia == null){
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
-
-        return new ResponseEntity<List<Agendamento>>(barbearia.getAgendamentos(), HttpStatus.OK);
-    }
+    
     // Buscando agendamento único
     @GetMapping(value = "/{id}", produces = "application/json")
     public ResponseEntity<Agendamento> visualizarAgendamento(@PathVariable(name= "id") Long id ){
@@ -59,18 +50,7 @@ public class AgendamentoController {
         }
 
         return new ResponseEntity<Agendamento>(agendamento, HttpStatus.OK);
-    }    
-        // Busca todos os agendamentos de um usuário
-    @GetMapping(value = "/usuario/{id}", produces = "application/json")
-        public ResponseEntity<List<Agendamento>> listarAgendamentosUsuario(@PathVariable("id") Long id){
-            Usuario usuario =  usuarioRepository.findById(id).isPresent()? usuarioRepository.findById(id).get():null;
-    
-            if (usuario == null){
-                return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-            }
-    
-            return new ResponseEntity<List<Agendamento>>(usuario.getAgendamentos(), HttpStatus.OK);
-        }
+    }   
 
     // Criando agendamentos
     @PostMapping(value = "/", produces = "application/json")

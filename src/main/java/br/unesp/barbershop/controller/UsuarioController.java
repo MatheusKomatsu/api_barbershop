@@ -89,5 +89,14 @@ public class UsuarioController {
         return "Usuario deletado";
     }
 
-    // criar /usuario/{id}/agendamentos
+    // Lista todas os agendamentos de um usuário
+    @GetMapping(value = "/{id}/agendamentos", produces = "application/json")
+    public ResponseEntity<List<Agendamento>> listarAgendamentoUsuario(@PathVariable("id") Long id){
+        Usuario usuario =  usuarioRepository.findById(id).isPresent()? usuarioRepository.findById(id).get():null;
+
+        if(usuario == null){
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+        return new ResponseEntity<List<Agendamento>>(usuario.getAgendamentos(), HttpStatus.OK);
+    }
 }

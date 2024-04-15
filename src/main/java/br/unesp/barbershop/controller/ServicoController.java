@@ -28,18 +28,7 @@ public class ServicoController {
 
     @Autowired
     private BarbeariaRepository barbeariaRepository;
-    // BUSCANDO todos os servicos de uma barbearia
-    @GetMapping(value = "/barbearia/{id}", produces = "application/json")
-    public ResponseEntity<List<Servico>> listarServicos(@PathVariable("id") Long id){
-        Barbearia barbearia = barbeariaRepository.findById(id).orElseGet(null);
-
-        if(barbearia == null){
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
-
-        
-        return new ResponseEntity<List<Servico>>(barbearia.getServicos(), HttpStatus.OK);
-    }
+    
     // Busca um serviço específico
     @GetMapping(value = "/{id}", produces = "application/json")
     public ResponseEntity<Servico> visualizarServico(@PathVariable("id") Long id){

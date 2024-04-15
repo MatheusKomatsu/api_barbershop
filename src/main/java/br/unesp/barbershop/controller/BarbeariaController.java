@@ -15,7 +15,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import br.unesp.barbershop.dto.BarbeariaDTO;
+import br.unesp.barbershop.model.Agendamento;
 import br.unesp.barbershop.model.Barbearia;
+import br.unesp.barbershop.model.Servico;
 import br.unesp.barbershop.model.Usuario;
 import br.unesp.barbershop.repository.BarbeariaRepository;
 import br.unesp.barbershop.repository.UsuarioRepository;
@@ -99,5 +101,29 @@ public class BarbeariaController {
         barbeariaRepository.deleteById(id);
 
         return "Barbearia deletada";
+    }
+
+    // BUSCANDO todos os servicos de uma barbearia
+    @GetMapping(value = "/{id}/servicos", produces = "application/json")
+    public ResponseEntity<List<Servico>> listarServicos(@PathVariable("id") Long id){
+        Barbearia barbearia = barbeariaRepository.findById(id).isPresent() ? barbeariaRepository.findById(id).get():null;
+
+        if(barbearia == null){
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+
+        
+        return new ResponseEntity<List<Servico>>(barbearia.getServicos(), HttpStatus.OK);
+    }
+
+    // Buscando todos os agendamentos de uma barbearia
+    @GetMapping(value = "/{id}/agendamentos", produces = "application/json")
+    public ResponseEntity<List<Agendamento>> listarAgendamentosBarbearia(@PathVariable(name= "id") Long id){
+        Barbearia barbearia = barbeariaRepository.findById(id).isPresent()? barbeariaRepository.findById(id).get():null;
+        if (barbearia == null){
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+
+        return new ResponseEntity<List<Agendamento>>(barbearia.getAgendamentos(), HttpStatus.OK);
     }
 }
