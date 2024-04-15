@@ -31,18 +31,27 @@ public class BarbeariaController {
 
     // BUSCANDO TODOS as barbearias
     @GetMapping(value = "/", produces = "application/json")
-    public ResponseEntity<List<Barbearia>> Barbearia(){
+    public ResponseEntity<List<Barbearia>> listarBarbearias(){
         List<Barbearia> barbearias_list = (List<Barbearia>) barbeariaRepository.findAll();
 
         return new ResponseEntity<List<Barbearia>>(barbearias_list, HttpStatus.OK);
     }
+    @GetMapping(value = "/{id}", produces = "application/json")
+    public ResponseEntity<Barbearia> visualizarBarbearia(@PathVariable("id") Long id){
+        Barbearia barbearia = barbeariaRepository.findById(id).get();
+        if (barbearia == null){
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
 
+        return new ResponseEntity<Barbearia>(barbearia, HttpStatus.OK);
+    }
+    // Criando Barbearia
     @PostMapping(value = "/", produces = "application/json")
     public ResponseEntity<Barbearia> cadastrar(@RequestBody BarbeariaDTO barbeariadto){
         Usuario usuario_dono = usuarioRepository.findById(barbeariadto.getUsuario_id()).orElseGet(null);;
 
         if(usuario_dono == null){
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
 
         Barbearia barbearia = new Barbearia();
@@ -61,7 +70,7 @@ public class BarbeariaController {
         Barbearia barbearia_atualizada = barbeariaRepository.findById(barbearia.getId()).get();
 
         if(barbearia_atualizada == null){
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
         barbearia_atualizada = barbeariaRepository.save(barbearia);
 
@@ -70,7 +79,7 @@ public class BarbeariaController {
 
     @DeleteMapping(value = "/{id}", produces = "application/json")
     public String deletar(@PathVariable("id") Long id){
-        Barbearia verifica_barbearia = barbeariaRepository.findById(id).orElseGet(null);;
+        Barbearia verifica_barbearia = barbeariaRepository.findById(id).isPresent() ? barbeariaRepository.findById(id).get():null;
 
         if(verifica_barbearia == null){
             return "Barbearia não encontrada";

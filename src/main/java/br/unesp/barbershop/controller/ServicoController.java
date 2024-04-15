@@ -30,15 +30,25 @@ public class ServicoController {
     private BarbeariaRepository barbeariaRepository;
     // BUSCANDO TODOS OS servicos
     @GetMapping(value = "/barbearia/{id}", produces = "application/json")
-    public ResponseEntity<List<Servico>> Servico(@PathVariable("id") Long id){
+    public ResponseEntity<List<Servico>> listarServicos(@PathVariable("id") Long id){
         Barbearia barbearia = barbeariaRepository.findById(id).orElseGet(null);
 
         if(barbearia == null){
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
 
         
         return new ResponseEntity<List<Servico>>(barbearia.getServicos(), HttpStatus.OK);
+    }
+    @GetMapping(value = "/{id}", produces = "application/json")
+    public ResponseEntity<Servico> visualizarServico(@PathVariable("id") Long id){
+        Servico servico = servicoRepository.findById(id).isPresent()? servicoRepository.findById(id).get(): null;
+
+        if(servico == null){
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+
+        return new ResponseEntity<Servico>(servico, HttpStatus.OK);
     }
 
 
@@ -47,7 +57,7 @@ public class ServicoController {
         Barbearia barbearia_servico = barbeariaRepository.findById(servicodto.getBarbearia_id()).orElseGet(null);;
 
         if(barbearia_servico == null){
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
 
 
@@ -66,7 +76,7 @@ public class ServicoController {
         Servico servico_atualizado = servicoRepository.findById(servico.getId()).orElseGet(null);;
 
         if(servico_atualizado == null){
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
 
         servico_atualizado = servicoRepository.save(servico);
@@ -76,7 +86,7 @@ public class ServicoController {
 
     @DeleteMapping(value = "/{id}", produces = "application/json")
     public String deletar(@PathVariable("id") Long id){
-        Servico verifica_servico = servicoRepository.findById(id).orElseGet(null);;
+        Servico verifica_servico = servicoRepository.findById(id).isPresent()? servicoRepository.findById(id).get(): null;
 
         if(verifica_servico == null){
             return "Serviço não encontrado";
