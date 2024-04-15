@@ -15,7 +15,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import br.unesp.barbershop.dto.BarbeariaDTO;
+import br.unesp.barbershop.model.Agendamento;
 import br.unesp.barbershop.model.Barbearia;
+import br.unesp.barbershop.model.Servico;
 import br.unesp.barbershop.model.Usuario;
 import br.unesp.barbershop.repository.BarbeariaRepository;
 import br.unesp.barbershop.repository.UsuarioRepository;
@@ -31,18 +33,41 @@ public class BarbeariaController {
 
     // BUSCANDO TODOS as barbearias
     @GetMapping(value = "/", produces = "application/json")
-    public ResponseEntity<List<Barbearia>> Barbearia(){
+    public ResponseEntity<List<Barbearia>> listarBarbearias(){
         List<Barbearia> barbearias_list = (List<Barbearia>) barbeariaRepository.findAll();
 
         return new ResponseEntity<List<Barbearia>>(barbearias_list, HttpStatus.OK);
     }
 
+    // Busca barbearia específica
+    @GetMapping(value = "/{id}", produces = "application/json")
+    public ResponseEntity<Barbearia> visualizarBarbearia(@PathVariable("id") Long id){
+        Barbearia barbearia = barbeariaRepository.findById(id).isPresent()
+        ?barbeariaRepository.findById(id).get():null;
+        if (barbearia == null){
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+
+        return new ResponseEntity<Barbearia>(barbearia, HttpStatus.OK);
+    }
+    // Buscando todos os agendamentos de uma barbearia
+    @GetMapping(value = "/{id}/agendamentos", produces = "application/json")
+    public ResponseEntity<List<Agendamento>> listarAgendamentosBarbearia(@PathVariable(name= "id") Long id){
+        Barbearia barbearia = barbeariaRepository.findById(id).isPresent()
+        ? barbeariaRepository.findById(id).get():null;
+        if (barbearia == null){
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+
+        return new ResponseEntity<List<Agendamento>>(barbearia.getAgendamentos(), HttpStatus.OK);
+    }
+    // Criando Barbearia
     @PostMapping(value = "/", produces = "application/json")
     public ResponseEntity<Barbearia> cadastrar(@RequestBody BarbeariaDTO barbeariadto){
         Usuario usuario_dono = usuarioRepository.findById(barbeariadto.getUsuario_id()).orElseGet(null);;
 
         if(usuario_dono == null){
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
 
         Barbearia barbearia = new Barbearia();
@@ -57,20 +82,28 @@ public class BarbeariaController {
     }
 
     @PutMapping(value = "/", produces = "application/json")
-    public ResponseEntity<Barbearia> atualizar(@RequestBody Barbearia barbearia){
-        Barbearia barbearia_atualizada = barbeariaRepository.findById(barbearia.getId()).get();
+    public ResponseEntity<Barbearia> atualizar(@RequestBody BarbeariaDTO barbeariadto){
+        Usuario usuario_dono = usuarioRepository.findById(barbeariadto.getUsuario_id()).isPresent()? 
+        usuarioRepository.findById(barbeariadto.getUsuario_id()).get():null;
 
-        if(barbearia_atualizada == null){
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        if(usuario_dono == null){
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
-        barbearia_atualizada = barbeariaRepository.save(barbearia);
 
-        return new ResponseEntity<>(barbearia_atualizada, HttpStatus.OK);
+        Barbearia barbearia = new Barbearia();
+        barbearia.setId(barbeariadto.getId());
+        barbearia.setNomeBarbearia(barbeariadto.getNomeBarbearia());
+        barbearia.setEndereco(barbeariadto.getEndereco());
+        barbearia.setUsuario(usuario_dono);
+        
+        Barbearia barbeariaAtualizada = barbeariaRepository.save(barbearia);
+
+        return new ResponseEntity<>(barbeariaAtualizada, HttpStatus.OK);
     }
 
     @DeleteMapping(value = "/{id}", produces = "application/json")
     public String deletar(@PathVariable("id") Long id){
-        Barbearia verifica_barbearia = barbeariaRepository.findById(id).orElseGet(null);;
+        Barbearia verifica_barbearia = barbeariaRepository.findById(id).isPresent() ? barbeariaRepository.findById(id).get():null;
 
         if(verifica_barbearia == null){
             return "Barbearia não encontrada";
@@ -80,4 +113,19 @@ public class BarbeariaController {
 
         return "Barbearia deletada";
     }
+
+    // BUSCANDO todos os servicos de uma barbearia
+    @GetMapping(value = "/{id}/servicos", produces = "application/json")
+    public ResponseEntity<List<Servico>> listarServicos(@PathVariable("id") Long id){
+        Barbearia barbearia = barbeariaRepository.findById(id).isPresent() ? barbeariaRepository.findById(id).get():null;
+
+        if(barbearia == null){
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+
+        
+        return new ResponseEntity<List<Servico>>(barbearia.getServicos(), HttpStatus.OK);
+    }
+
+
 }

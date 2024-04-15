@@ -14,6 +14,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import br.unesp.barbershop.model.Agendamento;
+import br.unesp.barbershop.model.Barbearia;
 import br.unesp.barbershop.model.Usuario;
 import br.unesp.barbershop.repository.UsuarioRepository;
 
@@ -26,10 +28,41 @@ public class UsuarioController {
 
     // BUSCANDO TODOS OS USUARIOS
     @GetMapping(value = "/", produces = "application/json")
-    public ResponseEntity<List<Usuario>> usuario(){
+    public ResponseEntity<List<Usuario>> listarUsuarios(){
         List<Usuario> usuarios_list = (List<Usuario>) usuarioRepository.findAll();
 
         return new ResponseEntity<List<Usuario>>(usuarios_list, HttpStatus.OK);
+    }
+    // Busca usuario específico
+    @GetMapping(value = "/{id}", produces = "application/json")
+    public ResponseEntity<Usuario> visualizarUsuarios(@PathVariable("id") Long id){
+        Usuario usuario =  usuarioRepository.findById(id).isPresent()? usuarioRepository.findById(id).get():null;
+
+        return new ResponseEntity<Usuario>(usuario, HttpStatus.OK);
+    }
+
+    // Lista todas as barbearias de um usuário
+    @GetMapping(value = "/{id}/barbearias", produces = "application/json")
+    public ResponseEntity<List<Barbearia>> listarBarbeariaUsuario(@PathVariable("id") Long id){
+        Usuario usuario =  usuarioRepository.findById(id).isPresent()
+        ? usuarioRepository.findById(id).get():null;
+
+        if(usuario == null){
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+        return new ResponseEntity<List<Barbearia>>(usuario.getBarbearias(), HttpStatus.OK);
+    }
+
+    // Lista todas os agendamentos de um usuário
+    @GetMapping(value = "/{id}/agendamentos", produces = "application/json")
+    public ResponseEntity<List<Agendamento>> listarAgendamentoUsuario(@PathVariable("id") Long id){
+        Usuario usuario =  usuarioRepository.findById(id).isPresent()
+        ? usuarioRepository.findById(id).get():null;
+
+        if(usuario == null){
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+        return new ResponseEntity<List<Agendamento>>(usuario.getAgendamentos(), HttpStatus.OK);
     }
 
     @PostMapping(value = "/", produces = "application/json")
@@ -39,12 +72,15 @@ public class UsuarioController {
         return new ResponseEntity<>(novo_usuario, HttpStatus.OK);
     }
 
+    
+
     @PutMapping(value = "/", produces = "application/json")
     public ResponseEntity<Usuario> atualizar(@RequestBody Usuario usuario){
-        Usuario usuario_atualizado = usuarioRepository.findById(usuario.getId()).orElseGet(null);
+        Usuario usuario_atualizado = usuarioRepository.findById(usuario.getId()).isPresent()
+        ?usuarioRepository.findById(usuario.getId()).get():null;
 
         if(usuario_atualizado == null){
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
         usuario_atualizado = usuarioRepository.save(usuario);
         
@@ -53,7 +89,7 @@ public class UsuarioController {
 
     @DeleteMapping(value = "/{id}", produces = "application/json")
     public String deletar(@PathVariable("id") Long id){
-        Usuario verifica_usuario = usuarioRepository.findById(id).orElseGet(null);;
+        Usuario verifica_usuario = usuarioRepository.findById(id).isPresent()? usuarioRepository.findById(id).get(): null;
 
         if(verifica_usuario == null){
             return "Usuário não encontrado";
@@ -61,6 +97,8 @@ public class UsuarioController {
 
         usuarioRepository.deleteById(id);
 
-        return "Usuario deletada";
+        return "Usuario deletado";
     }
+
+
 }

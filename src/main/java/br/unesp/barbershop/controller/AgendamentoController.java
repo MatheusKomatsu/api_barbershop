@@ -40,29 +40,32 @@ public class AgendamentoController {
     @Autowired
     private BarbeariaRepository barbeariaRepository;
 
-    // Buscando todos os agendamentos
-    @GetMapping(value = "/barbearia/{id}", produces = "application/json")
-    public ResponseEntity<List<Agendamento>> visualizarAgendamentosBarbearia(@PathVariable(name= "id") Long id){
-        Barbearia barbearia = barbeariaRepository.findById(id).orElseGet(null);
-        if (barbearia == null){
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+    
+    // Buscando agendamento único
+    @GetMapping(value = "/{id}", produces = "application/json")
+    public ResponseEntity<Agendamento> visualizarAgendamento(@PathVariable(name= "id") Long id ){
+        Agendamento agendamento = agendamentoRepository.findById(id).isPresent()?agendamentoRepository.findById(id).get():null;
+        if (agendamento == null){
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
 
-        return new ResponseEntity<List<Agendamento>>(barbearia.getAgendamentos(), HttpStatus.OK);
-    }  
+        return new ResponseEntity<Agendamento>(agendamento, HttpStatus.OK);
+    }   
 
     // Criando agendamentos
     @PostMapping(value = "/", produces = "application/json")
     public ResponseEntity<Agendamento> cadastrar(@RequestBody AgendamentoDTO agendamentoDto){
 
-        Barbearia barbearia_escolhida = barbeariaRepository.findById(agendamentoDto.getBarbearia_id()).orElseGet(null);
+        Barbearia barbearia_escolhida = barbeariaRepository.findById(agendamentoDto.getBarbearia_id()).isPresent()
+        ?barbeariaRepository.findById(agendamentoDto.getBarbearia_id()).get():null;
         if(barbearia_escolhida == null){
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
 
-        Usuario usuario_atendido = usuarioRepository.findById(agendamentoDto.getUsuario_id()).orElseGet(null);
+        Usuario usuario_atendido = usuarioRepository.findById(agendamentoDto.getUsuario_id()).isPresent()
+        ?usuarioRepository.findById(agendamentoDto.getUsuario_id()).get():null;
         if(usuario_atendido == null){
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
         
         List<Servico> servicos = barbearia_escolhida.getServicos();
@@ -71,14 +74,15 @@ public class AgendamentoController {
         
         for (Long servico_id : servicos_id){
 
-            Servico servico_aux = servicoRepository.findById(servico_id).isPresent() ? servicoRepository.findById(servico_id).get() : null;
+            Servico servico_aux = servicoRepository.findById(servico_id).isPresent() 
+            ? servicoRepository.findById(servico_id).get() : null;
             
             if(servico_aux == null){
-                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+                return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
             }
 
             if(!servicos.contains(servico_aux)){
-                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+                return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
             }
             
             servicos_agendamento.add(servico_aux);
@@ -99,21 +103,59 @@ public class AgendamentoController {
 
     // Editando agendamentos
     @PutMapping(value = "/", produces = "application/json")
-    public ResponseEntity<Agendamento> atualizar(@RequestBody Agendamento agendamento){
-        Agendamento agendamento_atualizado = agendamentoRepository.findById(agendamento.getId()).orElseGet(null);
+    public ResponseEntity<Agendamento> atualizar(@RequestBody AgendamentoDTO agendamentoDTO){
 
-        if(agendamento_atualizado == null){
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        Barbearia barbearia_escolhida = barbeariaRepository.findById(agendamentoDTO.getBarbearia_id()).isPresent()
+        ?barbeariaRepository.findById(agendamentoDTO.getBarbearia_id()).get():null;
+        if(barbearia_escolhida == null){
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
-        agendamento_atualizado = agendamentoRepository.save(agendamento);
+
+        Usuario usuario_atendido = usuarioRepository.findById(agendamentoDTO.getUsuario_id()).isPresent()
+        ?usuarioRepository.findById(agendamentoDTO.getUsuario_id()).get():null;
+        if(usuario_atendido == null){
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+        
+        List<Servico> servicos = barbearia_escolhida.getServicos();
+        List<Servico> servicos_agendamento = new ArrayList<>();
+        List<Long> servicos_id = agendamentoDTO.getServicos_id(); 
+        
+        for (Long servico_id : servicos_id){
+
+            Servico servico_aux = servicoRepository.findById(servico_id).isPresent() 
+            ? servicoRepository.findById(servico_id).get() : null;
+            
+            if(servico_aux == null){
+                return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+            }
+
+            if(!servicos.contains(servico_aux)){
+                return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+            }
+            
+            servicos_agendamento.add(servico_aux);
+        }
+
+
+        Agendamento agendamento = new Agendamento();
+        agendamento.setId(agendamentoDTO.getId());
+        agendamento.setData(agendamentoDTO.getData());
+        agendamento.setUsuario(usuario_atendido);
+        agendamento.setServicos(servicos_agendamento);
+        agendamento.setBarbearia(barbearia_escolhida);
+        
+        Agendamento agendamento_atualizado = agendamentoRepository.save(agendamento);
+
         return new ResponseEntity<>(agendamento_atualizado, HttpStatus.OK);
     }
+
 
     // Deletando agendamentos
     @DeleteMapping(value = "/{id}", produces = "application/json")
     public String deletar(@PathVariable("id") Long id){
-        Agendamento verifica_agendamento = agendamentoRepository.findById(id).orElseGet(null);
-
+        Agendamento verifica_agendamento = agendamentoRepository.findById(id).isPresent() 
+        ?agendamentoRepository.findById(id).get():null;
         if(verifica_agendamento == null){
             return "Agendamento não encontrado";
         }
@@ -122,4 +164,6 @@ public class AgendamentoController {
 
         return "Agendamento deletado";
     }
+
+    
 }
