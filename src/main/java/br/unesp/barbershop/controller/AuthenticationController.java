@@ -5,6 +5,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -17,7 +18,6 @@ import br.unesp.barbershop.model.Usuario;
 import br.unesp.barbershop.repository.UsuarioRepository;
 import br.unesp.barbershop.security.TokenService;
 import jakarta.validation.Valid;
-
 
 @RestController
 @RequestMapping("auth")
