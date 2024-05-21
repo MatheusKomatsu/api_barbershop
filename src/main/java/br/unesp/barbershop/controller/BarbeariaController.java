@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -49,6 +50,17 @@ public class BarbeariaController {
         }
 
         return new ResponseEntity<Barbearia>(barbearia, HttpStatus.OK);
+    }
+    // Buscando todos os agendamentos de uma barbearia
+    @GetMapping(value = "/{id}/agendamentos", produces = "application/json")
+    public ResponseEntity<List<Agendamento>> listarAgendamentosBarbearia(@PathVariable(name= "id") Long id){
+        Barbearia barbearia = barbeariaRepository.findById(id).isPresent()
+        ? barbeariaRepository.findById(id).get():null;
+        if (barbearia == null){
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+
+        return new ResponseEntity<List<Agendamento>>(barbearia.getAgendamentos(), HttpStatus.OK);
     }
     // Criando Barbearia
     @PostMapping(value = "/", produces = "application/json")
@@ -116,14 +128,5 @@ public class BarbeariaController {
         return new ResponseEntity<List<Servico>>(barbearia.getServicos(), HttpStatus.OK);
     }
 
-    // Buscando todos os agendamentos de uma barbearia
-    @GetMapping(value = "/{id}/agendamentos", produces = "application/json")
-    public ResponseEntity<List<Agendamento>> listarAgendamentosBarbearia(@PathVariable(name= "id") Long id){
-        Barbearia barbearia = barbeariaRepository.findById(id).isPresent()? barbeariaRepository.findById(id).get():null;
-        if (barbearia == null){
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
 
-        return new ResponseEntity<List<Agendamento>>(barbearia.getAgendamentos(), HttpStatus.OK);
-    }
 }

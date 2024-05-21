@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -44,7 +45,8 @@ public class UsuarioController {
     // Lista todas as barbearias de um usuário
     @GetMapping(value = "/{id}/barbearias", produces = "application/json")
     public ResponseEntity<List<Barbearia>> listarBarbeariaUsuario(@PathVariable("id") Long id){
-        Usuario usuario =  usuarioRepository.findById(id).isPresent()? usuarioRepository.findById(id).get():null;
+        Usuario usuario =  usuarioRepository.findById(id).isPresent()
+        ? usuarioRepository.findById(id).get():null;
 
         if(usuario == null){
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
@@ -52,7 +54,17 @@ public class UsuarioController {
         return new ResponseEntity<List<Barbearia>>(usuario.getBarbearias(), HttpStatus.OK);
     }
 
+    // Lista todas os agendamentos de um usuário
+    @GetMapping(value = "/{id}/agendamentos", produces = "application/json")
+    public ResponseEntity<List<Agendamento>> listarAgendamentoUsuario(@PathVariable("id") Long id){
+        Usuario usuario =  usuarioRepository.findById(id).isPresent()
+        ? usuarioRepository.findById(id).get():null;
 
+        if(usuario == null){
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+        return new ResponseEntity<List<Agendamento>>(usuario.getAgendamentos(), HttpStatus.OK);
+    }
 
     @PostMapping(value = "/", produces = "application/json")
     public ResponseEntity<Usuario> cadastrar(@RequestBody Usuario usuario){
@@ -89,14 +101,5 @@ public class UsuarioController {
         return "Usuario deletado";
     }
 
-    // Lista todas os agendamentos de um usuário
-    @GetMapping(value = "/{id}/agendamentos", produces = "application/json")
-    public ResponseEntity<List<Agendamento>> listarAgendamentoUsuario(@PathVariable("id") Long id){
-        Usuario usuario =  usuarioRepository.findById(id).isPresent()? usuarioRepository.findById(id).get():null;
 
-        if(usuario == null){
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
-        return new ResponseEntity<List<Agendamento>>(usuario.getAgendamentos(), HttpStatus.OK);
-    }
 }
