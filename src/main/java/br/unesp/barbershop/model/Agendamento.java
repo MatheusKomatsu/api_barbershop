@@ -25,15 +25,12 @@ public class Agendamento {
 
     private Date data;
 
-    @JsonIgnore
-    @org.hibernate.annotations.ForeignKey(name = "usuario_id")
     @ManyToOne
+    @JoinColumn(name = "usuario_id", referencedColumnName = "id")
     private Usuario usuario;
 
-
-    @JsonIgnore
-    @org.hibernate.annotations.ForeignKey(name="barbearia_id")
     @ManyToOne
+    @JoinColumn(name = "barbearia_id", referencedColumnName = "id")
     private Barbearia barbearia;
 
     @JsonIgnore

@@ -102,6 +102,23 @@ public class AgendamentoController {
         return new ResponseEntity<>(novo_agendamento, HttpStatus.OK);
     }
 
+    // Buscando agendamento por barbearia
+    @GetMapping(value = "/barbearia/{id}", produces = "application/json")
+    public ResponseEntity<List<Agendamento>> visualizarAgendamentosPorBarbearia(@PathVariable(name= "id") Long id ){
+        List<Agendamento> agendamentos = (List<Agendamento>) agendamentoRepository.findAll();
+        List<Agendamento> agendamentosAtt = new ArrayList<>();
+        for(Agendamento agendamento : agendamentos) {
+            Integer barbeariaID = agendamento.getBarbearia().getId().intValue();
+            Integer id_int = id.intValue();
+
+            if(barbeariaID.equals(id_int)){
+                agendamentosAtt.add(agendamento);
+            }
+        }
+
+        return new ResponseEntity<List<Agendamento>>(agendamentos, HttpStatus.OK);
+    }   
+
     // Editando agendamentos
     @PutMapping(value = "/", produces = "application/json")
     public ResponseEntity<Agendamento> atualizar(@RequestBody AgendamentoDTO agendamentoDTO){

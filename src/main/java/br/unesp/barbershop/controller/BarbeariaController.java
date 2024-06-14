@@ -21,6 +21,7 @@ import br.unesp.barbershop.model.Agendamento;
 import br.unesp.barbershop.model.Barbearia;
 import br.unesp.barbershop.model.Servico;
 import br.unesp.barbershop.model.Usuario;
+import br.unesp.barbershop.repository.AgendamentoRepository;
 import br.unesp.barbershop.repository.BarbeariaRepository;
 import br.unesp.barbershop.repository.ServicoRepository;
 import br.unesp.barbershop.repository.UsuarioRepository;
@@ -58,17 +59,7 @@ public class BarbeariaController {
 
         return new ResponseEntity<Barbearia>(barbearia, HttpStatus.OK);
     }
-    // Buscando todos os agendamentos de uma barbearia
-    @GetMapping(value = "/{id}/agendamentos", produces = "application/json")
-    public ResponseEntity<List<Agendamento>> listarAgendamentosBarbearia(@PathVariable(name= "id") Long id){
-        Barbearia barbearia = barbeariaRepository.findById(id).isPresent()
-        ? barbeariaRepository.findById(id).get():null;
-        if (barbearia == null){
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
-
-        return new ResponseEntity<List<Agendamento>>(barbearia.getAgendamentos(), HttpStatus.OK);
-    }
+    
     // Criando Barbearia
     @PostMapping(value = "/", produces = "application/json")
     public ResponseEntity<Barbearia> cadastrar(@RequestBody BarbeariaDTO barbeariadto){
@@ -132,7 +123,7 @@ public class BarbeariaController {
         for(Servico servico  : servicos) {
             Integer idBarbearia = servico.getBarbearia().getId().intValue();
             Integer servicoID = id.intValue();
-            
+
             if(idBarbearia.equals(servicoID)){
                 servicosAtt.add(servico);
             }
