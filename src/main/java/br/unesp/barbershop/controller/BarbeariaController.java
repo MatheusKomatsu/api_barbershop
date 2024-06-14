@@ -2,6 +2,8 @@ package br.unesp.barbershop.controller;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -115,21 +117,18 @@ public class BarbeariaController {
 
     // BUSCANDO todos os servicos de uma barbearia
     @GetMapping(value = "/{id}/servicos", produces = "application/json")
-    public ResponseEntity<List<Servico>> listarServicos(@PathVariable("id") Long id){
-        List<Servico> servicos = (List<Servico>) servicoRepository.findAll();
-        List<Servico> servicosAtt = new ArrayList<>();
-
-        
-        for(Servico servico  : servicos) {
-            Integer idBarbearia = servico.getBarbearia().getId().intValue();
-            Integer servicoID = id.intValue();
-
-            if(idBarbearia.equals(servicoID)){
-                servicosAtt.add(servico);
-            }
+    public ResponseEntity<List<Servico>> listarServicosPorBarbearia(@PathVariable("id") Long id) {
+        // Verifica se a barbearia existe
+        if (!barbeariaRepository.existsById(id)) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
 
-        return new ResponseEntity<List<Servico>>(servicosAtt, HttpStatus.OK);
+        // Converte Iterable para Stream
+        List<Servico> servicos = StreamSupport.stream(servicoRepository.findAll().spliterator(), false)
+                .filter(servico -> servico.getBarbearia().getId().equals(id))
+                .collect(Collectors.toList());
+
+        return new ResponseEntity<>(servicos, HttpStatus.OK);
     }
 
 

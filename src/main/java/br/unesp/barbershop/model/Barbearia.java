@@ -5,6 +5,7 @@ package br.unesp.barbershop.model;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.CascadeType;
@@ -33,7 +34,7 @@ public class Barbearia{
     @OneToMany(mappedBy = "barbearia", orphanRemoval = true, cascade = CascadeType.ALL)
     private List<Servico> servicos = new ArrayList<Servico>();
 
-    @JsonIgnore
+    @JsonBackReference
     @OneToMany(mappedBy="barbearia", orphanRemoval = true, cascade = CascadeType.ALL)
     private List<Agendamento> agendamentos = new ArrayList<Agendamento>();
 
