@@ -29,10 +29,11 @@ public class SecurityConfigurations {
                 .authorizeHttpRequests(authorize -> authorize
                 .requestMatchers(HttpMethod.POST, "auth/login").permitAll()
                 .requestMatchers(HttpMethod.POST, "auth/register").permitAll()
-                .requestMatchers(HttpMethod.GET, "/barbearia").hasRole("ADMIN")
+                .requestMatchers(HttpMethod.GET, "/barbearia/").permitAll()
                 .requestMatchers(HttpMethod.GET, "/servico").hasRole("ADMIN")
                 .requestMatchers(HttpMethod.GET, "/agendamento").hasRole("ADMIN")
                 .requestMatchers(HttpMethod.GET, "/usuario").hasRole("ADMIN")
+                .requestMatchers(HttpMethod.GET, "/usuario/minha_conta").permitAll()
                 .anyRequest().authenticated())
                 .addFilterBefore(securityFilter, UsernamePasswordAuthenticationFilter.class)
                 .build();

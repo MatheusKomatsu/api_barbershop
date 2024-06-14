@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -12,13 +13,16 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import br.unesp.barbershop.Service.AuthorizationService;
 import br.unesp.barbershop.model.Agendamento;
 import br.unesp.barbershop.model.Barbearia;
 import br.unesp.barbershop.model.Usuario;
 import br.unesp.barbershop.repository.UsuarioRepository;
+import br.unesp.barbershop.security.TokenService;
 
 @RestController
 @RequestMapping("/usuario")
@@ -26,6 +30,9 @@ public class UsuarioController {
     
     @Autowired
     private UsuarioRepository usuarioRepository;
+
+    @Autowired
+    private TokenService tokenService;
 
     // BUSCANDO TODOS OS USUARIOS
     @GetMapping(value = "/", produces = "application/json")
@@ -40,6 +47,21 @@ public class UsuarioController {
         Usuario usuario =  usuarioRepository.findById(id).isPresent()? usuarioRepository.findById(id).get():null;
 
         return new ResponseEntity<Usuario>(usuario, HttpStatus.OK);
+    }
+
+    // Busca usuario por token
+    @GetMapping(value = "/minha_conta", produces = "application/json")
+    public ResponseEntity visualizarUsuarioPorToken(@RequestHeader("Authorization") String authorizationHeader) {
+        // Extraindo o token do cabeçalho
+        String token = authorizationHeader.replace("Bearer ", "");
+        
+        try {
+            String result = tokenService.validateToken(token);
+            Usuario usuario =  usuarioRepository.findByLogin(result);
+            return new ResponseEntity<Long>(usuario.getId(), HttpStatus.OK);
+        } catch (com.auth0.jwt.exceptions.JWTDecodeException e) {
+            return new ResponseEntity("Token JWT inválido: " + e.getMessage(), HttpStatus.BAD_REQUEST);
+        }
     }
 
     // Lista todas as barbearias de um usuário
@@ -68,6 +90,7 @@ public class UsuarioController {
 
     @PostMapping(value = "/", produces = "application/json")
     public ResponseEntity<Usuario> cadastrar(@RequestBody Usuario usuario){
+
         Usuario novo_usuario = usuarioRepository.save(usuario);
         
         return new ResponseEntity<>(novo_usuario, HttpStatus.OK);

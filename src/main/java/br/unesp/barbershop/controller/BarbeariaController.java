@@ -1,5 +1,6 @@
 package br.unesp.barbershop.controller;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +22,7 @@ import br.unesp.barbershop.model.Barbearia;
 import br.unesp.barbershop.model.Servico;
 import br.unesp.barbershop.model.Usuario;
 import br.unesp.barbershop.repository.BarbeariaRepository;
+import br.unesp.barbershop.repository.ServicoRepository;
 import br.unesp.barbershop.repository.UsuarioRepository;
 
 @RestController
@@ -32,10 +34,14 @@ public class BarbeariaController {
     @Autowired
     private UsuarioRepository usuarioRepository;
 
+    @Autowired
+    private ServicoRepository servicoRepository;
+
     // BUSCANDO TODOS as barbearias
     @GetMapping(value = "/", produces = "application/json")
     public ResponseEntity<List<Barbearia>> listarBarbearias(){
         List<Barbearia> barbearias_list = (List<Barbearia>) barbeariaRepository.findAll();
+
 
         return new ResponseEntity<List<Barbearia>>(barbearias_list, HttpStatus.OK);
     }
@@ -45,6 +51,7 @@ public class BarbeariaController {
     public ResponseEntity<Barbearia> visualizarBarbearia(@PathVariable("id") Long id){
         Barbearia barbearia = barbeariaRepository.findById(id).isPresent()
         ?barbeariaRepository.findById(id).get():null;
+
         if (barbearia == null){
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
@@ -118,14 +125,20 @@ public class BarbeariaController {
     // BUSCANDO todos os servicos de uma barbearia
     @GetMapping(value = "/{id}/servicos", produces = "application/json")
     public ResponseEntity<List<Servico>> listarServicos(@PathVariable("id") Long id){
-        Barbearia barbearia = barbeariaRepository.findById(id).isPresent() ? barbeariaRepository.findById(id).get():null;
-
-        if(barbearia == null){
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
+        List<Servico> servicos = (List<Servico>) servicoRepository.findAll();
+        List<Servico> servicosAtt = new ArrayList<>();
 
         
-        return new ResponseEntity<List<Servico>>(barbearia.getServicos(), HttpStatus.OK);
+        for(Servico servico  : servicos) {
+            Integer idBarbearia = servico.getBarbearia().getId().intValue();
+            Integer servicoID = id.intValue();
+            
+            if(idBarbearia.equals(servicoID)){
+                servicosAtt.add(servico);
+            }
+        }
+
+        return new ResponseEntity<List<Servico>>(servicosAtt, HttpStatus.OK);
     }
 
 
