@@ -85,6 +85,9 @@ public class UsuarioController {
         if(usuario == null){
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
+
+
+
         return new ResponseEntity<List<Agendamento>>(usuario.getAgendamentos(), HttpStatus.OK);
     }
 
