@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import br.unesp.barbershop.dto.BarbeariaDTO;
+import br.unesp.barbershop.dto.BarbeariaUpdateDTO;
 import br.unesp.barbershop.model.Agendamento;
 import br.unesp.barbershop.model.Barbearia;
 import br.unesp.barbershop.model.Servico;
@@ -83,21 +84,22 @@ public class BarbeariaController {
     }
 
     @PutMapping(value = "/", produces = "application/json")
-    public ResponseEntity<Barbearia> atualizar(@RequestBody BarbeariaDTO barbeariadto){
-        Usuario usuario_dono = usuarioRepository.findById(barbeariadto.getUsuario_id()).isPresent()? 
-        usuarioRepository.findById(barbeariadto.getUsuario_id()).get():null;
+    public ResponseEntity<Barbearia> atualizar(@RequestBody BarbeariaUpdateDTO barbeariadto){
+    // Busca a Barbearia pelo ID
+        Barbearia barbeariaExistente = barbeariaRepository.findById(barbeariadto.getId()).orElse(null);
 
-        if(usuario_dono == null){
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        // Verifica se a Barbearia existe
+        if (barbeariaExistente == null) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
 
-        Barbearia barbearia = new Barbearia();
-        barbearia.setId(barbeariadto.getId());
-        barbearia.setNomeBarbearia(barbeariadto.getNomeBarbearia());
-        barbearia.setEndereco(barbeariadto.getEndereco());
-        barbearia.setUsuario(usuario_dono);
-        
-        Barbearia barbeariaAtualizada = barbeariaRepository.save(barbearia);
+        // Atualiza apenas os campos necessários
+        barbeariaExistente.setNomeBarbearia(barbeariadto.getNomeBarbearia());
+        barbeariaExistente.setEndereco(barbeariadto.getEndereco());
+        // Não é necessário setar o usuário dono novamente se não mudou
+
+        // Salva a Barbearia atualizada
+        Barbearia barbeariaAtualizada = barbeariaRepository.save(barbeariaExistente);
 
         return new ResponseEntity<>(barbeariaAtualizada, HttpStatus.OK);
     }
