@@ -37,6 +37,13 @@ public class Usuario implements UserDetails{
         this.barbearias = barbearias;
         this.agendamentos = agendamentos;
     }
+    
+    public Usuario(String email, String senha, UserRole role) {
+        this.email = email;
+        this.senha = senha;
+        this.role = role;
+    }
+
     public Usuario(String nome, String email, String senha, UserRole role) {
         this.nome = nome;
         this.email = email;
@@ -44,16 +51,9 @@ public class Usuario implements UserDetails{
         this.role = role;
     }
 
-    public Usuario(String email, String senha, UserRole role) {
-        this.email = email;
-        this.senha = senha;
-        this.role = role;
-    }
     
     public Usuario() {
     }
-
-
 
     @OneToMany(mappedBy = "usuario", orphanRemoval = true, cascade = CascadeType.ALL)
     private List<Barbearia> barbearias = new ArrayList<Barbearia>();

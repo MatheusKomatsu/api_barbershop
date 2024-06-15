@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import br.unesp.barbershop.Service.AuthorizationService;
+import br.unesp.barbershop.dto.UsuarioDTO;
 import br.unesp.barbershop.model.Agendamento;
 import br.unesp.barbershop.model.Barbearia;
 import br.unesp.barbershop.model.Usuario;
@@ -92,11 +93,17 @@ public class UsuarioController {
     }
 
     @PostMapping(value = "/", produces = "application/json")
-    public ResponseEntity<Usuario> cadastrar(@RequestBody Usuario usuario){
+    public ResponseEntity<Usuario> cadastrar(@RequestBody UsuarioDTO dto){
 
-        Usuario novo_usuario = usuarioRepository.save(usuario);
+        Usuario novo_usuario = new Usuario();
+        novo_usuario.setNome(dto.getNome());
+        novo_usuario.setEmail(dto.getEmail());
+        novo_usuario.setSenha(dto.getSenha());
+        novo_usuario.setRole(dto.getRole());
+
+        Usuario res = usuarioRepository.save(novo_usuario);
         
-        return new ResponseEntity<>(novo_usuario, HttpStatus.OK);
+        return new ResponseEntity<Usuario>(res, HttpStatus.OK);
     }
 
     
