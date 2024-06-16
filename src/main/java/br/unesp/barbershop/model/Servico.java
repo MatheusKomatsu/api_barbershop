@@ -3,6 +3,7 @@ package br.unesp.barbershop.model;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
@@ -23,7 +24,7 @@ public class Servico {
     private float tempoServicoMinutos; 
     private String descricao;
 
-    @JsonIgnore
+    @JsonManagedReference
     @ManyToOne
     @org.hibernate.annotations.ForeignKey(name = "barbearia_id")
     private Barbearia barbearia;

@@ -42,6 +42,17 @@ public class ServicoController {
         return new ResponseEntity<Servico>(servico, HttpStatus.OK);
     }
 
+    @GetMapping(value = "/", produces = "application/json")
+    public ResponseEntity<List<Servico>> visualizarTodosServicos(){
+        List<Servico> servicos = (List<Servico>) servicoRepository.findAll();
+
+        if(servicos == null){
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+
+        return new ResponseEntity<List<Servico>>(servicos, HttpStatus.OK);
+    }
+
 
     @PostMapping(value = "/", produces = "application/json")
     public ResponseEntity<Servico> cadastrar(@RequestBody ServicoDTO servicodto){
