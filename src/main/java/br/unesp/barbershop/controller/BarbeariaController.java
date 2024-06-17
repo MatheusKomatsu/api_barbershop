@@ -1,6 +1,5 @@
 package br.unesp.barbershop.controller;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
@@ -8,7 +7,6 @@ import java.util.stream.StreamSupport;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -20,11 +18,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 import br.unesp.barbershop.dto.BarbeariaDTO;
 import br.unesp.barbershop.dto.BarbeariaUpdateDTO;
-import br.unesp.barbershop.model.Agendamento;
 import br.unesp.barbershop.model.Barbearia;
 import br.unesp.barbershop.model.Servico;
 import br.unesp.barbershop.model.Usuario;
-import br.unesp.barbershop.repository.AgendamentoRepository;
 import br.unesp.barbershop.repository.BarbeariaRepository;
 import br.unesp.barbershop.repository.ServicoRepository;
 import br.unesp.barbershop.repository.UsuarioRepository;
@@ -76,6 +72,7 @@ public class BarbeariaController {
         barbearia.setId(barbeariadto.getId());
         barbearia.setNomeBarbearia(barbeariadto.getNomeBarbearia());
         barbearia.setEndereco(barbeariadto.getEndereco());
+        barbearia.setImagem(barbeariadto.getImagem());
         barbearia.setUsuario(usuario_dono);
         
         Barbearia nova_barbearia = barbeariaRepository.save(barbearia);
@@ -96,6 +93,7 @@ public class BarbeariaController {
         // Atualiza apenas os campos necessários
         barbeariaExistente.setNomeBarbearia(barbeariadto.getNomeBarbearia());
         barbeariaExistente.setEndereco(barbeariadto.getEndereco());
+        barbeariaExistente.setImagem(barbeariadto.getImagem());
         // Não é necessário setar o usuário dono novamente se não mudou
 
         // Salva a Barbearia atualizada

@@ -4,6 +4,7 @@ public class BarbeariaUpdateDTO {
     private Long id;
     private String nomeBarbearia;
     private String endereco;
+    private String imagem;
 
     // Getters e Setters
     public Long getId() {
@@ -29,4 +30,13 @@ public class BarbeariaUpdateDTO {
     public void setEndereco(String endereco) {
         this.endereco = endereco;
     }
+
+    public String getImagem() {
+        return imagem;
+    }
+
+    public void setImagem(String imagem) {
+        this.imagem = imagem;
+    }
+    
 }

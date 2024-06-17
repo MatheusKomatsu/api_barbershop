@@ -5,8 +5,12 @@ public class ServicoDTO {
     private String nome;
     private float preco;
     private float tempoServicoMinutos; 
+    private String imagem;
     private String descricao;
     private Long barbearia_id;
+
+    public ServicoDTO() {
+    }
 
     public Long getId() {
         return id;
@@ -44,6 +48,11 @@ public class ServicoDTO {
     public void setBarbearia_id(Long barbearia_id) {
         this.barbearia_id = barbearia_id;
     }
-
+    public String getImagem() {
+        return imagem;
+    }
+    public void setImagem(String imagem) {
+        this.imagem = imagem;
+    }
     
 }

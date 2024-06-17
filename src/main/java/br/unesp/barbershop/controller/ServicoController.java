@@ -66,7 +66,7 @@ public class ServicoController {
 
         Servico novo_servico = new Servico(servicodto.getId(), servicodto.getNome(), servicodto.getPreco(), 
                                             servicodto.getTempoServicoMinutos()
-                                            , servicodto.getDescricao(), barbearia_servico, null);
+                                            , servicodto.getDescricao(), servicodto.getImagem(), barbearia_servico, null);
         
         
         
@@ -87,7 +87,7 @@ public class ServicoController {
 
         Servico servico_atualizado = new Servico(servicoDTO.getId(), servicoDTO.getNome(), servicoDTO.getPreco()
                                             ,servicoDTO.getTempoServicoMinutos()
-                                            , servicoDTO.getDescricao(), barbearia_servico, null);
+                                            , servicoDTO.getDescricao(), servicoDTO.getImagem(), barbearia_servico, null);
         
         
         

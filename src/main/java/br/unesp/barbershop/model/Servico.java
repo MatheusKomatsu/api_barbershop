@@ -23,6 +23,7 @@ public class Servico {
     private float preco;
     private float tempoServicoMinutos; 
     private String descricao;
+    private String imagem;
 
     @JsonManagedReference
     @ManyToOne
@@ -36,13 +37,14 @@ public class Servico {
     public Servico() {
     }
 
-    public Servico(Long id, String nome, float preco, float tempoServicoMinutos, String descricao, Barbearia barbearia,
-            List<Agendamento> agendamentos) {
+    public Servico(Long id, String nome, float preco, float tempoServicoMinutos, String descricao, String imagem,
+            Barbearia barbearia, List<Agendamento> agendamentos) {
         this.id = id;
         this.nome = nome;
         this.preco = preco;
         this.tempoServicoMinutos = tempoServicoMinutos;
         this.descricao = descricao;
+        this.imagem = imagem;
         this.barbearia = barbearia;
         this.agendamentos = agendamentos;
     }
@@ -102,5 +104,13 @@ public class Servico {
 
     public void setAgendamentos(List<Agendamento> agendamentos) {
         this.agendamentos = agendamentos;
+    }
+
+    public String getImagem() {
+        return imagem;
+    }
+
+    public void setImagem(String imagem) {
+        this.imagem = imagem;
     }
 }
