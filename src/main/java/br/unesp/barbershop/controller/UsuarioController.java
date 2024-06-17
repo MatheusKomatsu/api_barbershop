@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -19,6 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import br.unesp.barbershop.Service.AuthorizationService;
 import br.unesp.barbershop.dto.UsuarioDTO;
+import br.unesp.barbershop.dto.UsuarioUpdateDTO;
 import br.unesp.barbershop.model.Agendamento;
 import br.unesp.barbershop.model.Barbearia;
 import br.unesp.barbershop.model.Usuario;
@@ -109,14 +111,22 @@ public class UsuarioController {
     
 
     @PutMapping(value = "/", produces = "application/json")
-    public ResponseEntity<Usuario> atualizar(@RequestBody Usuario usuario){
+    public ResponseEntity<Usuario> atualizar(@RequestBody UsuarioUpdateDTO usuario){
         Usuario usuario_atualizado = usuarioRepository.findById(usuario.getId()).isPresent()
         ?usuarioRepository.findById(usuario.getId()).get():null;
 
         if(usuario_atualizado == null){
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
-        usuario_atualizado = usuarioRepository.save(usuario);
+
+        usuario_atualizado.setNome(usuario.getNome());
+
+        if(usuario.isTrocouSenha()){
+            String encryptedPassword = new BCryptPasswordEncoder().encode(usuario.getSenha());
+            usuario_atualizado.setSenha(encryptedPassword);
+        }
+        
+        usuarioRepository.save(usuario_atualizado);
         
         return new ResponseEntity<>(usuario_atualizado, HttpStatus.OK);
     }
