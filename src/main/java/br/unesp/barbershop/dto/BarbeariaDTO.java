@@ -7,6 +7,7 @@ public class BarbeariaDTO {
     private Long id;
     private String nomeBarbearia;
     private String endereco;
+    private String imagem;
     private Long usuario_id;
     private List<Long> servicos_id = new ArrayList<Long>();
     private List<Long> agendamentos_id = new ArrayList<Long>();
@@ -54,5 +55,12 @@ public class BarbeariaDTO {
     public void setAgendamentos_id(List<Long> agendamentos_id) {
         this.agendamentos_id = agendamentos_id;
     }
-    
+
+    public String getImagem() {
+        return imagem;
+    }
+
+    public void setImagem(String imagem) {
+        this.imagem = imagem;
+    }
 }

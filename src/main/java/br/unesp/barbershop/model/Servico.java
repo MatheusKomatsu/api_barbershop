@@ -1,18 +1,17 @@
 package br.unesp.barbershop.model;
+
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.JoinTable;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.UniqueConstraint;
+import jakarta.persistence.OneToMany;
 
 @Entity
 public class Servico {
@@ -24,50 +23,33 @@ public class Servico {
     private float preco;
     private float tempoServicoMinutos; 
     private String descricao;
+    private String imagem;
 
-    @JsonIgnore
-    @org.hibernate.annotations.ForeignKey(name = "barbearia_id")
+    @JsonManagedReference
     @ManyToOne
+    @org.hibernate.annotations.ForeignKey(name = "barbearia_id")
     private Barbearia barbearia;
 
     @JsonIgnore
-    @ManyToMany(fetch = FetchType.EAGER)
-    @JoinTable(name = "servicos_agendamentos",
-                uniqueConstraints = @UniqueConstraint (
-                    columnNames = {"servico_id", "agendamento_id"},
-                    name = "unique_user_servico"
-                ),
-                joinColumns = @JoinColumn(name = "servico_id",
-                    referencedColumnName = "id",
-                    table = "servico",
-                    unique = false
-                ),
-                inverseJoinColumns = @JoinColumn (
-                    name = "agendamento_id",
-                    referencedColumnName = "id",
-                    table = "agendamento",
-                    unique = false
-                    //updatable = false,
-                )
-    )
+    @OneToMany(mappedBy = "servico", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Agendamento> agendamentos;
 
     public Servico() {
     }
 
-    public Servico(Long id, String nome, float preco, float tempoServicoMinutos, String descricao, Barbearia barbearia,
-            List<Agendamento> agendamentos) {
+    public Servico(Long id, String nome, float preco, float tempoServicoMinutos, String descricao, String imagem,
+            Barbearia barbearia, List<Agendamento> agendamentos) {
         this.id = id;
         this.nome = nome;
         this.preco = preco;
         this.tempoServicoMinutos = tempoServicoMinutos;
         this.descricao = descricao;
+        this.imagem = imagem;
         this.barbearia = barbearia;
         this.agendamentos = agendamentos;
     }
 
-
-
+    // Getters e setters
     public Long getId() {
         return id;
     }
@@ -122,5 +104,13 @@ public class Servico {
 
     public void setAgendamentos(List<Agendamento> agendamentos) {
         this.agendamentos = agendamentos;
+    }
+
+    public String getImagem() {
+        return imagem;
+    }
+
+    public void setImagem(String imagem) {
+        this.imagem = imagem;
     }
 }

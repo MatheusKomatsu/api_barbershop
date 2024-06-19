@@ -1,10 +1,7 @@
 package br.unesp.barbershop.dto;
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 
 public class AgendamentoDTO {
-    private Long id;
 
     private Date data;
 
@@ -12,15 +9,7 @@ public class AgendamentoDTO {
 
     private Long usuario_id;
 
-    private List<Long> servicos_id = new ArrayList<Long>();
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
+    private Long servico_id;
 
     public Date getData() {
         return data;
@@ -38,12 +27,12 @@ public class AgendamentoDTO {
         this.usuario_id = usuario_id;
     }
 
-    public List<Long> getServicos_id() {
-        return servicos_id;
+    public Long getServico_id() {
+        return servico_id;
     }
 
-    public void setServicos_id(List<Long> servicos_id) {
-        this.servicos_id = servicos_id;
+    public void setServico_id(Long servico_id) {
+        this.servico_id = servico_id;
     }
 
     public Long getBarbearia_id() {

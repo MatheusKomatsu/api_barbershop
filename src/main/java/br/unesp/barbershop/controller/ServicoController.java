@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -41,6 +42,17 @@ public class ServicoController {
         return new ResponseEntity<Servico>(servico, HttpStatus.OK);
     }
 
+    @GetMapping(value = "/", produces = "application/json")
+    public ResponseEntity<List<Servico>> visualizarTodosServicos(){
+        List<Servico> servicos = (List<Servico>) servicoRepository.findAll();
+
+        if(servicos == null){
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+
+        return new ResponseEntity<List<Servico>>(servicos, HttpStatus.OK);
+    }
+
 
     @PostMapping(value = "/", produces = "application/json")
     public ResponseEntity<Servico> cadastrar(@RequestBody ServicoDTO servicodto){
@@ -54,7 +66,7 @@ public class ServicoController {
 
         Servico novo_servico = new Servico(servicodto.getId(), servicodto.getNome(), servicodto.getPreco(), 
                                             servicodto.getTempoServicoMinutos()
-                                            , servicodto.getDescricao(), barbearia_servico, null);
+                                            , servicodto.getDescricao(), servicodto.getImagem(), barbearia_servico, null);
         
         
         
@@ -75,7 +87,7 @@ public class ServicoController {
 
         Servico servico_atualizado = new Servico(servicoDTO.getId(), servicoDTO.getNome(), servicoDTO.getPreco()
                                             ,servicoDTO.getTempoServicoMinutos()
-                                            , servicoDTO.getDescricao(), barbearia_servico, null);
+                                            , servicoDTO.getDescricao(), servicoDTO.getImagem(), barbearia_servico, null);
         
         
         

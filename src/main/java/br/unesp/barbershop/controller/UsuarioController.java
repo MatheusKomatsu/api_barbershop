@@ -5,19 +5,24 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import br.unesp.barbershop.dto.UsuarioDTO;
+import br.unesp.barbershop.dto.UsuarioUpdateDTO;
 import br.unesp.barbershop.model.Agendamento;
 import br.unesp.barbershop.model.Barbearia;
 import br.unesp.barbershop.model.Usuario;
 import br.unesp.barbershop.repository.UsuarioRepository;
+import br.unesp.barbershop.security.TokenService;
 
 @RestController
 @RequestMapping("/usuario")
@@ -25,6 +30,9 @@ public class UsuarioController {
     
     @Autowired
     private UsuarioRepository usuarioRepository;
+
+    @Autowired
+    private TokenService tokenService;
 
     // BUSCANDO TODOS OS USUARIOS
     @GetMapping(value = "/", produces = "application/json")
@@ -39,6 +47,21 @@ public class UsuarioController {
         Usuario usuario =  usuarioRepository.findById(id).isPresent()? usuarioRepository.findById(id).get():null;
 
         return new ResponseEntity<Usuario>(usuario, HttpStatus.OK);
+    }
+
+    // Busca usuario por token
+    @GetMapping(value = "/minha_conta", produces = "application/json")
+    public ResponseEntity visualizarUsuarioPorToken(@RequestHeader("Authorization") String authorizationHeader) {
+        // Extraindo o token do cabeçalho
+        String token = authorizationHeader.replace("Bearer ", "");
+        
+        try {
+            String result = tokenService.validateToken(token);
+            Usuario usuario =  usuarioRepository.findByLogin(result);
+            return new ResponseEntity<Long>(usuario.getId(), HttpStatus.OK);
+        } catch (com.auth0.jwt.exceptions.JWTDecodeException e) {
+            return new ResponseEntity("Token JWT inválido: " + e.getMessage(), HttpStatus.BAD_REQUEST);
+        }
     }
 
     // Lista todas as barbearias de um usuário
@@ -62,27 +85,45 @@ public class UsuarioController {
         if(usuario == null){
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
+
+
+
         return new ResponseEntity<List<Agendamento>>(usuario.getAgendamentos(), HttpStatus.OK);
     }
 
     @PostMapping(value = "/", produces = "application/json")
-    public ResponseEntity<Usuario> cadastrar(@RequestBody Usuario usuario){
-        Usuario novo_usuario = usuarioRepository.save(usuario);
+    public ResponseEntity<Usuario> cadastrar(@RequestBody UsuarioDTO dto){
+
+        Usuario novo_usuario = new Usuario();
+        novo_usuario.setNome(dto.getNome());
+        novo_usuario.setEmail(dto.getEmail());
+        novo_usuario.setSenha(dto.getSenha());
+        novo_usuario.setRole(dto.getRole());
+
+        Usuario res = usuarioRepository.save(novo_usuario);
         
-        return new ResponseEntity<>(novo_usuario, HttpStatus.OK);
+        return new ResponseEntity<Usuario>(res, HttpStatus.OK);
     }
 
     
 
     @PutMapping(value = "/", produces = "application/json")
-    public ResponseEntity<Usuario> atualizar(@RequestBody Usuario usuario){
+    public ResponseEntity<Usuario> atualizar(@RequestBody UsuarioUpdateDTO usuario){
         Usuario usuario_atualizado = usuarioRepository.findById(usuario.getId()).isPresent()
         ?usuarioRepository.findById(usuario.getId()).get():null;
 
         if(usuario_atualizado == null){
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
-        usuario_atualizado = usuarioRepository.save(usuario);
+
+        usuario_atualizado.setNome(usuario.getNome());
+
+        if(usuario.isTrocouSenha()){
+            String encryptedPassword = new BCryptPasswordEncoder().encode(usuario.getSenha());
+            usuario_atualizado.setSenha(encryptedPassword);
+        }
+        
+        usuarioRepository.save(usuario_atualizado);
         
         return new ResponseEntity<>(usuario_atualizado, HttpStatus.OK);
     }
@@ -99,6 +140,4 @@ public class UsuarioController {
 
         return "Usuario deletado";
     }
-
-
 }

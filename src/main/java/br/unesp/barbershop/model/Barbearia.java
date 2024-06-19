@@ -5,6 +5,7 @@ package br.unesp.barbershop.model;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.CascadeType;
@@ -23,6 +24,7 @@ public class Barbearia{
 
     private String nomeBarbearia;
     private String endereco;
+    private String imagem;
 
     @JsonIgnore
     @org.hibernate.annotations.ForeignKey(name = "usuario_id")
@@ -33,7 +35,7 @@ public class Barbearia{
     @OneToMany(mappedBy = "barbearia", orphanRemoval = true, cascade = CascadeType.ALL)
     private List<Servico> servicos = new ArrayList<Servico>();
 
-    @JsonIgnore
+    @JsonBackReference
     @OneToMany(mappedBy="barbearia", orphanRemoval = true, cascade = CascadeType.ALL)
     private List<Agendamento> agendamentos = new ArrayList<Agendamento>();
 
@@ -41,14 +43,20 @@ public class Barbearia{
     public Barbearia() {
     }
 
-    public Barbearia(Long id, String nomeBarbearia, String endereco, Usuario usuario, List<Servico> servicos, List<Agendamento> agendamentos) {
+    
+
+    public Barbearia(Long id, String nomeBarbearia, String endereco, String imagem, Usuario usuario,
+            List<Servico> servicos, List<Agendamento> agendamentos) {
         this.id = id;
         this.nomeBarbearia = nomeBarbearia;
         this.endereco = endereco;
+        this.imagem = imagem;
         this.usuario = usuario;
         this.servicos = servicos;
         this.agendamentos = agendamentos;
     }
+
+
 
     public Long getId() {
         return id;
@@ -95,6 +103,14 @@ public class Barbearia{
 
     public void setAgendamentos(List<Agendamento> agendamentos) {
         this.agendamentos = agendamentos;
+    }
+
+    public String getImagem() {
+        return imagem;
+    }
+
+    public void setImagem(String imagem) {
+        this.imagem = imagem;
     }    
 
 }
